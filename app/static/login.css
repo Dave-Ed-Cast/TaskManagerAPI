@@ -1,0 +1,141 @@
+/* 
+rem is 16px by default => font-size: 2rem => 32px. It's commonly used for font sizes and padding/margin scaling with text
+
+vw (vh) is viewpowrt width (height) => font-size: 5vw; is 5% of viewport width.
+It's commonly used for font sizes cscaling with screen and full screen elements, banners, background or responsive spacing
+
+% is relative to parent element so width: 80% is relative to the container. 
+It's commonly used for width/height of elements inside a container, flexible forms images or divs.
+*/
+
+/* ===== RESET & BASE STYLES ===== */
+
+/* Reset box-sizing and margins */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Full-height flex layout for centering container */
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== LOGIN PAGE DECORATIONS ===== */
+
+/* Animated welcome heading */
+h1.login-page {
+    position: absolute;
+    top: 10vh;                
+    font-size: 2.5vw;          
+    letter-spacing: 0.05rem;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ===== FORM CONTAINER CARD ===== */
+
+/* The white box containing the login form and inputs */
+.container {
+    transform: scale(0.95);
+    opacity: 0;
+    animation: popIn 1s forwards;
+
+    /* Internal spacing and size */
+    padding: 4rem 3rem;       /* spacing inside the container */
+    width: 40rem;               /* relative width to viewport */
+    max-width: 40rem;         /* max width for large screens */
+    border-radius: 1rem;
+    box-shadow: 0 2rem 4rem rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* ===== FORM TITLE ===== */
+h2 {
+    margin-bottom: 2rem;
+    font-weight: 600;
+    font-size: 1.75rem;      /* relative size, scales nicely */
+}
+
+/* Login-specific title color */
+body.login-page h2 {
+    color: #333; 
+}
+
+/* ===== INPUT FIELDS (text/password) ===== */
+input {
+    width: 100%;             /* full width inside container */
+    padding: 0.75rem 1rem;   /* internal spacing */
+    margin: 0.5rem 0 1.25rem 0;  /* spacing between inputs */
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+/* Input focus effect */
+input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+}
+
+/* ===== BUTTONS (login / submit) ===== */
+button {
+    width: 100%;             /* full width in container */
+    padding: 0.75rem;        /* internal spacing */
+    font-size: 1.125rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Login page button colors & hover */
+body.login-page button {
+    background: #667eea;
+    color: white;
+}
+
+body.login-page button:hover {
+    background: #667eea;
+    transform: scale(1.05);
+}
+
+.submit-bt:hover {
+    background: #667eea;
+}
+
+/* ===== LOGIN MESSAGES ===== */
+#msg {
+    margin-top: 15px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* ===== FOOTER / SMALL TEXT (inside container) ===== */
+.container p {
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+/* Login page footer text */
+body.login-page .container p {
+    color: #555;
+}

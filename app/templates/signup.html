@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="static/login.css">
+</head>
+
+<body class="signup-page">
+    <h1 class="login-page">Join Us!</h1>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <input type="text" name="username" placeholder="Username" required><br>
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" required><br>
+            <button type="submit">Create Account</button>
+        </form>
+        <p id="msg"></p>
+
+        <!-- Button to go back to login -->
+        <p>Already have an account?
+            <a href="/" class="link">Sign in</a>
+        </p>
+    </div>
+
+    <script src="/static/signup.js?v=1.0.1"></script>
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+import os
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from app.database import init_db
+from app.routes import users, tasks
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+
+app = FastAPI(title="Task Manager API")
+
+# Mount static files correctly
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# Set up templates correctly
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
+
+# Initialize database
+init_db()
+
+# Include API routers
+app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(tasks.router, prefix="/tasks", tags=["Tasks"])
+
+# Serve login page at / and /login.html
+@app.get("/", response_class=HTMLResponse)
+@app.get("/login.html", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+# Serve user page
+@app.get("/user", response_class=HTMLResponse)
+def user_page(request: Request):
+    return templates.TemplateResponse("user.html", {"request": request})
+
+# Serve signup page
+@app.get("/signup", response_class=HTMLResponse)
+@app.get("/signup.html", response_class=HTMLResponse)
+def signup_page(request: Request):
+    return templates.TemplateResponse("signup.html", {"request": request})
