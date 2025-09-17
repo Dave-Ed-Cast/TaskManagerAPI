@@ -1,24 +1,29 @@
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends
 from datetime import timedelta
-
-from .. import crud, auth, models
-from ..crud import delete_user
+from ..database import auth
+from ..database import crud, models
+from ..database.crud import delete_user
+from .tasks import get_current_user
 
 router = APIRouter()
+
 
 @router.post("/register")
 def register(user: models.UserCreate):
     existing = crud.get_user(user.username)
-    if existing: raise HTTPException(status_code=400, detail="Username already taken")
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already taken")
     user_data = crud.create_user(user.username, user.password, user.is_admin)
     return user_data
+
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     db_user = crud.get_user(form_data.username)
-    
+
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
@@ -37,7 +42,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.get("/all")
 def list_users():
-    from app.database import get_db
+    from app.database.database import get_db
 
     with get_db() as connection:
         cursor = connection.cursor()
@@ -46,20 +51,41 @@ def list_users():
 
     return [{"id": u[0], "username": u[1], "is_admin": u[2]} for u in users]
 
+
 @router.delete("/{username}")
 def remove_user(username: str, current_user=Depends(auth.admin_required)):
     success = delete_user(username)
-    if not success: raise HTTPException(status_code=404, detail="User not found")
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
     return {"message": f"User '{username}' deleted"}
 
-from fastapi import APIRouter, HTTPException, Depends
 
 @router.put("/{username}/role")
 def change_role(username: str, is_admin: bool, current_user=Depends(auth.admin_required)):
-    from ..crud import update_user_role
-    
+    from ..database.crud import update_user_role
+
     success = update_user_role(username, is_admin)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     return {"message": f"Role updated for {username}"}
+
+
+@router.post("/")
+def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
+
+    user_id, _, _ = user
+    crud.create_task(task.title, task.description, user_id)
+    return {"msg": "Task created successfully"}
+
+
+@router.get("/")
+def list_tasks(user=Depends(get_current_user)):
+
+    user_id, _, _ = user
+    tasks = crud.get_tasks(user_id)
+    return [
+        {"id": t[0], "title": t[1], "description": t[2],
+            "done": t[3], "owner_id": t[4]}
+        for t in tasks
+    ]

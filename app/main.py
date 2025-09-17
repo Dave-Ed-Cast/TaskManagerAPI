@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.database import init_db
+from app.database.database import init_db
 from app.routes import users, tasks
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
