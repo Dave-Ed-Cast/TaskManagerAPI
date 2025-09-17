@@ -1,12 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends
-from datetime import timedelta
-from ..database import auth
-from ..database import crud, models
+from datetime import timedelta, timezone
+from ..database import auth, crud, models
 from ..database.crud import delete_user
 from .tasks import get_current_user
+from ..constants import (
+    USERNAME_TAKEN_EX, INVALID_CREDENTIALS_EX, 
+    TOKEN_EXPIRATION, USER_NOT_FOUND_EX
+)
 
 router = APIRouter()
 
@@ -14,8 +15,11 @@ router = APIRouter()
 @router.post("/register")
 def register(user: models.UserCreate):
     existing = crud.get_user(user.username)
-    if existing:
-        raise HTTPException(status_code=400, detail="Username already taken")
+
+    # The truthy statements symbolizes that the get_user actually returns something
+    # And is not None, False, 0, "", [], {}, etc.
+    if existing: raise HTTPException(USERNAME_TAKEN_EX)
+
     user_data = crud.create_user(user.username, user.password, user.is_admin)
     return user_data
 
@@ -24,14 +28,14 @@ def register(user: models.UserCreate):
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     db_user = crud.get_user(form_data.username)
 
-    if not db_user:
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+    if not db_user: raise HTTPException(INVALID_CREDENTIALS_EX)
 
-    user_id, username, hashed_password, is_admin = db_user
-    if not auth.verify_password(form_data.password, hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+    _, username, hashed_password, is_admin = db_user
+    
+    psw_match = auth.verify_password(form_data.password, hashed_password)
+    if not psw_match: raise HTTPException(INVALID_CREDENTIALS_EX)
 
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=TOKEN_EXPIRATION)
     token = auth.create_access_token(
         data={"sub": username, "is_admin": bool(is_admin)},
         expires_delta=access_token_expires
@@ -46,17 +50,18 @@ def list_users():
 
     with get_db() as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT id, username, is_admin FROM users")
+        read_query = "SELECT id, username, is_admin FROM users"
+        cursor.execute(read_query)
         users = cursor.fetchall()
-
-    return [{"id": u[0], "username": u[1], "is_admin": u[2]} for u in users]
+        
+    return [{"id": user[0], "username": user[1], "is_admin": user[2]} for user in users]
 
 
 @router.delete("/{username}")
 def remove_user(username: str, current_user=Depends(auth.admin_required)):
     success = delete_user(username)
-    if not success:
-        raise HTTPException(status_code=404, detail="User not found")
+    if not success: raise HTTPException(status_code=404, detail="User not found")
+
     return {"message": f"User '{username}' deleted"}
 
 
@@ -65,27 +70,22 @@ def change_role(username: str, is_admin: bool, current_user=Depends(auth.admin_r
     from ..database.crud import update_user_role
 
     success = update_user_role(username, is_admin)
-    if not success:
-        raise HTTPException(status_code=404, detail="User not found")
+    if not success: raise HTTPException(USER_NOT_FOUND_EX)
 
     return {"message": f"Role updated for {username}"}
 
 
 @router.post("/")
 def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
-
     user_id, _, _ = user
     crud.create_task(task.title, task.description, user_id)
+
     return {"msg": "Task created successfully"}
 
 
 @router.get("/")
 def list_tasks(user=Depends(get_current_user)):
-
     user_id, _, _ = user
     tasks = crud.get_tasks(user_id)
-    return [
-        {"id": t[0], "title": t[1], "description": t[2],
-            "done": t[3], "owner_id": t[4]}
-        for t in tasks
-    ]
+
+    return [{"id": t[0], "title": t[1], "description": t[2],"done": t[3], "owner_id": t[4]} for t in tasks]
