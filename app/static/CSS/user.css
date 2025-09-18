@@ -1,53 +1,25 @@
-/* 
-rem is 16px by default => font-size: 2rem => 32px. It's commonly used for font sizes and padding/margin scaling with text
+/* ===== USER PAGE STYLES ===== */
 
-vw (vh) is viewpowrt width (height) => font-size: 5vw; is 5% of viewport width.
-It's commonly used for font sizes cscaling with screen and full screen elements, banners, background or responsive spacing
-
-% is relative to parent element so width: 80% is relative to the container. 
-It's commonly used for width/height of elements inside a container, flexible forms images or divs.
-*/
-
-/* Reset box-sizing and margins */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-/* Full-height flex layout for centering container */
-html,
-body {
-    height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
+body.user-page {
+    display: contents;
     justify-content: center;
     align-items: center;
-}
-
-/* ===== USER PAGE STYLES ===== */
-body.user-page {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
     padding: 2rem;
     height: auto;
 }
 
 .user-container {
-    width: 100%;
-    max-width: 800px;
+    width: 100vw;
+    max-width: 40vw;
     margin: auto;
     text-align: center;
 }
 
-/* Centered greeting */
 .greeting {
     font-size: 2rem;
     margin-bottom: 2rem;
 }
 
-/* Profile info aligned left */
 .profile-info {
     text-align: left;
     margin-bottom: 2rem;
@@ -55,50 +27,42 @@ body.user-page {
     line-height: 1.6rem;
 }
 
-/* User list container - not a table */
 .user-list-container {
     width: 100%;
+    align-items: flex-start;
     margin: auto;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    margin-bottom: 0.25rem;
+    background: #f9f9f9;
+    border-radius: 0.25rem;
+    transition: background 0.15s ease;
+    gap: 4rem;
 }
 
 .user-item:hover {
     background: #e0ebff;
 }
 
-.user-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* username left, button right */
-    padding: 0.75rem 2rem;
-    border: 1px solid #ccc;
-    margin-bottom: 0.5rem;
-    background: #f9f9f9;
-    border-radius: 0.5rem;
-    transition: background 0.15s ease;
-    gap: 2.5rem; /* even spacing between items */
-}
-
-/* Username and Role take equal space */
 .user-item .username,
 .user-item .role {
-    flex: 1; /* grows evenly */
-    text-align: center; /* optional, center text inside its space */
+    flex: 1;
+    text-align: center;
 }
 
-/* Role button - completely independent */
 .role-btn {
-    display: inline-block;      /* keep button inline */
-    min-width: 120px;           /* minimum width for consistency */
-    padding: 0.5rem 1.25rem;    
+    min-width: 120px;
+    padding: 0.5rem 1.25rem;
     font-size: 0.9rem;
-    border-radius: 0.4rem;
-    border: none;
     background: #667eea;
     color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;        /* prevent wrapping */
-    text-align: center;
+    white-space: nowrap;
 }
 
 .role-btn:hover {
@@ -106,76 +70,44 @@ body.user-page {
     transform: scale(1.05);
 }
 
-.user-table {
-    flex-grow: 1;
-    border-collapse: collapse;
-    font-size: 1rem;
-}
-
-.user-table th,
-.user-table td {
-    border: 1px solid #ccc;
-    padding: 0.5rem 0.75rem;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.user-table th {
-    background: #667eea;
-    color: white;
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-/* Logout button */
 .logout-btn {
     margin-top: 2rem;
     background: #667eea;
     color: white;
     padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
     border: 0.05rem solid #ccc;
     font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
     background: #e0ebff;
 }
 
-/* Delete button (trash icon) */
 .delete-btn {
     background: transparent;
-    border: black;
-    cursor: pointer;
+    border: none;
     font-size: 1rem;
-    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .delete-btn:hover {
     transform: scale(1.2);
-    color: #c53030; /* darker red */
+    color: #c53030;
 }
 
 .admin-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 1rem;
 }
 
-/* Style the + button */
 .add-user-btn {
     background: #667eea;
     color: white;
-    border: none;
     border-radius: 50%;
     width: 1.75vw;
     height: 1.75vw;
     font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .add-user-btn:hover {
@@ -183,130 +115,14 @@ body.user-page {
     transform: scale(1.1);
 }
 
-/* The modal overlay */
-/* Modal overlay (dimmed background) */
-.modal {
-    display: none; /* hidden by default */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.6); /* slightly darker for focus */
-    backdrop-filter: blur(2px); /* subtle blur for background */
-    transition: opacity 0.3s ease;
-    opacity: 0;
-}
-
-.modal.show {
-    display: block;
-    opacity: 1;
-}
-
-/* Modal content */
-.modal-content {
-    background-color: #f9f9ff;
-    margin: 8% auto;
-    padding: 2rem;
-    border-radius: 1rem;
-    width: 350px;
-    max-width: 90%;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    position: relative;
-    transform: translateY(-20px);
-    transition: all 0.3s ease;
-}
-
-.modal.show .modal-content {
-    transform: translateY(0);
-}
-
-/* Close button */
-.modal-content .close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: #333;
-    transition: color 0.2s ease;
-}
-
-.modal-content .close:hover {
-    color: #667eea;
-}
-
-/* Form styling */
-.modal-content form {
+.admin-header {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between; /* push items to edges */
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-.modal-content label {
-    font-size: 0.95rem;
-    font-weight: 500;
-    text-align: left;
-}
-
-.modal-content input[type="text"],
-.modal-content input[type="password"] {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.modal-content input[type="text"]:focus,
-.modal-content input[type="password"]:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
-    outline: none;
-}
-
-/* Checkbox styling */
-.modal-content input[type="checkbox"] {
-    accent-color: #667eea;
-}
-
-/* Modal action buttons */
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.modal-actions button {
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.modal-actions button[type="submit"] {
-    background-color: #667eea;
-    color: white;
-}
-
-.modal-actions button[type="submit"]:hover {
-    background-color: #5a67d8;
-    transform: scale(1.05);
-}
-
-.modal-actions button[type="button"] {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-.modal-actions button[type="button"]:hover {
-    background-color: #e2e8f0;
-    transform: scale(1.05);
+.admin-header h2 {
+    margin-right: 1rem;
+    font-size: 2rem;
 }
