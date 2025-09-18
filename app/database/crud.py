@@ -1,4 +1,5 @@
 from .database import get_db
+from ..constants import USERNAME_TAKEN_EX
 from .auth import hash_password, create_access_token
 from fastapi import HTTPException
 from datetime import datetime, timezone
@@ -11,7 +12,7 @@ def create_user(username: str, password: str, is_admin: bool = False):
 
     # Check the user doesn't already exist
     if get_user(username):
-        raise HTTPException(status_code=409, detail="Username already exists")
+        raise HTTPException(USERNAME_TAKEN_EX)
 
     hashed_pw = hash_password(password)
 
@@ -48,6 +49,7 @@ def create_task(title: str, description: str, owner_id: int):
         create_query = "INSERT INTO tasks (title, description, owner_id) VALUES (?, ?, ?)"
         cursor.execute(create_query, (title, description, owner_id))
         connection.commit()
+        return cursor.lastrowid
 
 
 # ==== R in the crud acronym ====
@@ -64,6 +66,13 @@ def get_tasks(owner_id: int):
         cursor = connection.cursor()
         get_query = "SELECT * FROM tasks WHERE owner_id=?"
         cursor.execute(get_query, (owner_id,))
+        return cursor.fetchall()
+
+
+def get_all_tasks():
+    with get_db() as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks")
         return cursor.fetchall()
 
 

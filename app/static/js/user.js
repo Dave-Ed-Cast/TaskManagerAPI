@@ -95,20 +95,31 @@ async function loadUsers(token) {
             const div = document.createElement("div");
             div.classList.add("user-item");
             div.innerHTML = `
-                <div class="username">${u.username}</div>
+            <div class="username">${u.username}</div>
                 <div class="role">${u.is_admin ? "Admin" : "User"}</div>
                 <button class="role-btn" data-username="${u.username}" data-role="${!u.is_admin}">
                     ${u.is_admin ? "Make User" : "Make Admin"}
                 </button>
-
+                <button class="key-btn" data-username="${u.username}" title="Reset Password">
+                    🔑
+                </button>
                 <button class="delete-btn" data-username="${u.username}" title="Delete">
-                🗑️
+                    🗑️
                 </button>
             `;
             container.appendChild(div);
         });
+        
+        // Key button listener
+        container.querySelectorAll(".key-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const username = btn.dataset.username;
+                const newPass = prompt(`Enter a new password for ${username}:`);
+                if (!newPass) return;
+                resetPassword(username, newPass);
+            });
+        });
 
-        // Attach event listeners
         container.querySelectorAll(".role-btn").forEach(btn => {
             btn.addEventListener("click", () => changeRole(btn.dataset.username, btn.dataset.role === "true"));
         });
@@ -154,6 +165,32 @@ async function deleteUser(username) {
         alert("Failed to delete user");
     }
 }
+
+async function resetPassword(username, newPassword) {
+    const token = localStorage.getItem("token"); // must be admin token
+
+    try {
+        const res = await fetch(`/users/${username}/password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ new_password: newPassword })
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) throw new Error(json.detail || "Failed to update password");
+
+        alert(json.msg || "Password updated successfully");
+        loadUsers(token);
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+
 
 document.querySelector(".logout-btn")?.addEventListener("click", () => {
     localStorage.clear();
