@@ -1,5 +1,13 @@
-/* ===== LOGIN PAGE STYLES ===== */
-h1.login-page {
+/* ===== SIGNUP PAGE STYLES ===== */
+body.signup-page {
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+}
+
+h1.signup-page {
     position: absolute;
     top: 10vh;                
     font-size: 2.5vw;          
@@ -8,11 +16,9 @@ h1.login-page {
     animation: fadeIn 2s forwards;
 }
 
-@keyframes fadeIn { to { opacity: 1; } }
 
-@keyframes popIn {
-    to { transform: scale(1); opacity: 1; }
-}
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes popIn { to { transform: scale(1); opacity: 1; } }
 
 .container {
     transform: scale(0.95);
@@ -32,7 +38,9 @@ h2 {
     font-size: 1.75rem;
 }
 
-body.login-page h2 { color: #333; }
+body.signup-page h2 {
+    color: #333;
+}
 
 input {
     width: 100%;
@@ -46,10 +54,10 @@ input {
 
 input:focus {
     border-color: #667eea;
-    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 8px rgba(102,126,234,0.5);
 }
 
-body.login-page button {
+body.signup-page button {
     width: 100%;
     padding: 0.75rem;
     font-size: 1.125rem;
@@ -58,20 +66,35 @@ body.login-page button {
     color: white;
 }
 
-body.login-page button:hover {
+body.signup-page button:hover {
     background: #5a67d8;
     transform: scale(1.05);
 }
 
+/* Signup messages */
 #msg {
     margin-top: 15px;
     font-weight: 500;
     font-size: 14px;
 }
 
+/* Container small text */
 .container p {
     margin-top: 15px;
     font-size: 13px;
 }
 
-body.login-page .container p { color: #555; }
+body.signup-page .container p {
+    color: #555;
+}
+
+/* Links inside container */
+.container .link {
+    color: #667eea;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+.container .link:hover {
+    text-decoration: underline;
+}
