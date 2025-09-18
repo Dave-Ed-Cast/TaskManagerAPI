@@ -37,7 +37,8 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/users/
         username: str = payload.get("sub")
         is_admin: bool = payload.get("is_admin")
 
-        if username is None: raise HTTPException(INVALID_TOKEN_EXCEPTION)
+        if username is None:
+            raise HTTPException(INVALID_TOKEN_EX)
 
         return {"username": username, "is_admin": is_admin}
     except JWTError:
@@ -45,5 +46,6 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/users/
 
 
 def admin_required(current_user=Depends(get_current_user)):
-    if not current_user.get("is_admin", False): raise HTTPException(ADMIN_REQUIRED_EX)
+    if not current_user.get("is_admin", False):
+        raise HTTPException(ADMIN_REQUIRED_EX)
     return current_user

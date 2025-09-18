@@ -17,3 +17,6 @@ class Task(TaskCreate):
     id: int
     done: bool
     owner_id: int
+    
+class PasswordUpdate(BaseModel):
+    new_password: str
