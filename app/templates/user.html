@@ -5,22 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Page</title>
-    <link rel="stylesheet" href="/static/user.css?v=1.0.1">
-
+    <link rel="stylesheet" href="/static/CSS/user.css?v=1.0.1">
 </head>
 
 <body class="user-page">
     <div class="user-container">
-        <!-- Centered greeting -->
         <h2 class="greeting">Hello <span id="username"></span>!</h2>
 
-        <!-- Profile info aligned vertically on the left -->
         <div class="profile-info">
             <p><strong>Role:</strong> <span id="role"></span></p>
             <p><strong>Date of creation:</strong> <span id="created_at"></span></p>
         </div>
 
-        <!-- Admin panel -->
         <div id="admin-panel" class="admin-panel" style="display:none;">
             <div class="admin-header">
                 <h3>All Users</h3>
@@ -29,7 +25,6 @@
             <div class="user-list-container" id="user-list"></div>
         </div>
 
-        <!-- Add User Modal -->
         <div id="add-user-modal" class="modal">
             <div class="modal-content">
                 <button class="close" id="close-add">&times;</button>
@@ -41,9 +36,7 @@
                     <label>Password:</label>
                     <input type="password" id="new-password" required>
 
-                    <label>
-                        <input type="checkbox" id="new-is-admin"> Admin
-                    </label>
+                    <label><input type="checkbox" id="new-is-admin">Admin</label>
 
                     <div class="modal-actions">
                         <button type="submit">Create</button>
@@ -54,8 +47,10 @@
         </div>
 
 
-        <button class="logout-btn"><h4>Logout</h4></button>
-        <script src="/static/user.js?v=1.0.1"></script>
+        <button class="logout-btn">
+            <h4>Logout</h4>
+        </button>
+        <script src="/static/js/user.js?v=1.0.1"></script>
     </div>
 </body>
 
