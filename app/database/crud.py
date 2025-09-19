@@ -1,5 +1,6 @@
 from .database import get_db
 from .auth import hash_password, create_access_token
+from ..constants import USERNAME_TAKEN_EX
 from fastapi import HTTPException
 from datetime import datetime, timezone
 
@@ -11,7 +12,7 @@ def create_user(username: str, password: str, is_admin: bool = False):
 
     # Check the user doesn't already exist
     if get_user(username):
-        raise HTTPException(status_code=409, detail="Username already exists")
+        raise HTTPException(USERNAME_TAKEN_EX)
 
     hashed_pw = hash_password(password)
 

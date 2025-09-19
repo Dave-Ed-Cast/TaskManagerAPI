@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from ..constants import (
-    SECRET_KEY, ALGORITHM, TOKEN_EXPIRATION,
+    SECRET_KEY, ALGORITHM, TOKEN_EXPIRATION_MINS,
     INVALID_TOKEN_EX, ADMIN_REQUIRED_EX
 )
 
@@ -25,7 +25,7 @@ def verify_password(password: str, hashed: str) -> bool:
 # creates a JWT token in regard of the time set by access token expire minutes
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=TOKEN_EXPIRATION))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=TOKEN_EXPIRATION_MINS))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -37,7 +37,8 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/users/
         username: str = payload.get("sub")
         is_admin: bool = payload.get("is_admin")
 
-        if username is None: raise HTTPException(INVALID_TOKEN_EXCEPTION)
+        if username is None:
+            raise HTTPException(INVALID_TOKEN_EX)
 
         return {"username": username, "is_admin": is_admin}
     except JWTError:
@@ -45,5 +46,6 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/users/
 
 
 def admin_required(current_user=Depends(get_current_user)):
-    if not current_user.get("is_admin", False): raise HTTPException(ADMIN_REQUIRED_EX)
+    if not current_user.get("is_admin", False):
+        raise HTTPException(ADMIN_REQUIRED_EX)
     return current_user

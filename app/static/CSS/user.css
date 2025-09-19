@@ -126,3 +126,16 @@ body.user-page {
     margin-right: 1rem;
     font-size: 2rem;
 }
+
+.key-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.key-btn:hover {
+    color: #38a169; /* green highlight */
+    transform: scale(1.2);
+}

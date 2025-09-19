@@ -100,15 +100,22 @@ async function loadUsers(token) {
                 <button class="role-btn" data-username="${u.username}" data-role="${!u.is_admin}">
                     ${u.is_admin ? "Make User" : "Make Admin"}
                 </button>
+                <button class="key-btn" data-username="${u.username}" title="Delete">🔑</button>
+                <button class="delete-btn" data-username="${u.username}" title="Delete">🗑️</button>
 
-                <button class="delete-btn" data-username="${u.username}" title="Delete">
-                🗑️
-                </button>
             `;
             container.appendChild(div);
         });
 
-        // Attach event listeners
+        container.querySelectorAll(".key-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const username = btn.dataset.username;
+                const newPass = prompt(`Enter a new password for ${username}:`);
+                if (!newPass) return;
+                resetPassword(username, newPass);
+            });
+        });
+
         container.querySelectorAll(".role-btn").forEach(btn => {
             btn.addEventListener("click", () => changeRole(btn.dataset.username, btn.dataset.role === "true"));
         });
@@ -147,11 +154,43 @@ async function deleteUser(username) {
             method: "DELETE",
             headers: { "Authorization": "Bearer " + token }
         });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.detail || "Failed to delete user");
+            return;
+        }
+
         const json = await res.json();
         alert(json.message);
-        loadUsers(token); // refresh list
+        loadUsers(token);
+
     } catch {
         alert("Failed to delete user");
+    }
+}
+
+async function resetPassword(username, newPassword) {
+    const admin_token = localStorage.getItem("token");
+
+    try {
+        const res = await fetch(`/users/${username}/password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + admin_token
+            },
+            body: JSON.stringify({ new_password: newPassword })
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) throw new Error(json.detail || "Failed to update password");
+
+        alert(json.msg || "Password updated successfully");
+        loadUsers(admin_token);
+    } catch (err) {
+        alert(err.message);
     }
 }
 
