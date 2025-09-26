@@ -9,14 +9,17 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+class PasswordUpdate(BaseModel):
+    new_password: str
+
+
 class TaskCreate(BaseModel):
     title: str
     description: str | None = None
+    is_shared: bool = False
+
 
 class Task(TaskCreate):
     id: int
     done: bool
     owner_id: int
-
-class PasswordUpdate(BaseModel):
-    new_password: str

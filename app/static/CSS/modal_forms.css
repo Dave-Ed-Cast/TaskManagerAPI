@@ -1,0 +1,123 @@
+/* ===== UNIFIED MODAL FORM STYLES ===== */
+
+/* Modal Title */
+.form-modal h3 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Modal Content Area */
+.form-modal .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 2rem 2.5rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 35rem;
+    position: relative;
+    text-align: left; /* Align form content to the left */
+    transform: scale(0.95);
+    opacity: 0;
+    animation: popIn 0.5s forwards;
+}
+
+/* Form Labels */
+.form-modal .modal-content label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Text and Password Inputs */
+.form-modal .modal-content input[type="text"],
+.form-modal .modal-content input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    outline: none;
+}
+
+.form-modal .modal-content input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+}
+
+/* Checkbox Styling */
+.form-modal .modal-content label:has(input[type="checkbox"]) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.form-modal .modal-content input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+
+/* Action Buttons Container */
+.form-modal .modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* General Button Styles */
+.form-modal .modal-actions button {
+    padding: 0.6rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+/* Submit Button */
+.form-modal .modal-actions button[type="submit"] {
+    background: #667eea;
+    color: white;
+}
+
+.form-modal .modal-actions button[type="submit"]:hover {
+    background: #5a67d8;
+    transform: scale(1.05);
+}
+
+/* Cancel Button */
+.form-modal .modal-actions button[type="button"] {
+    background: #e2e8f0;
+    color: #333;
+}
+
+.form-modal .modal-actions button[type="button"]:hover {
+    background: #cbd5e0;
+    transform: scale(1.05);
+}
+
+/* Close 'X' Button */
+.form-modal .modal-content .close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #555;
+}
+
+/* Animations */
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes popIn { to { transform: scale(1); opacity: 1; } }

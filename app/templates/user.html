@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/CSS/base.css?v=<?=time()?>">
     <link rel="stylesheet" href="/static/CSS/components.css?v=<?=time()?>">
     <link rel="stylesheet" href="/static/CSS/user.css?v=<?=time()?>">
-    <link rel="stylesheet" href="/static/CSS/new_user.css?v=<?=time()?>">
+    <link rel="stylesheet" href="/static/CSS/modal_forms.css?v=<?=time()?>">
 
 </head>
 
@@ -38,7 +38,7 @@
         </div>
 
 
-        <div id="add-user-modal" class="modal new-user-modal">
+        <div id="add-user-modal" class="modal form-modal">
             <div class="modal-content">
                 <button class="close" id="close-add">&times;</button>
                 <h3>Add New User</h3>
@@ -60,7 +60,7 @@
         </div>
 
 
-        <div id="add-task-modal" class="modal new-user-modal">
+        <div id="add-task-modal" class="modal form-modal">
             <div class="modal-content">
                 <button class="close" id="close-task-modal">&times;</button>
                 <h3>Add New Task</h3>
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="modal-actions">
-                        <button type="submit">Create Task</button>
+                        <button type="submit">Create</button>
                         <button type="button" id="cancel-task-modal">Cancel</button>
                     </div>
                 </form>
