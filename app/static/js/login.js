@@ -18,7 +18,8 @@ document.getElementById("loginForm")?.addEventListener("submit", async function 
 
         if (res.ok) {
             localStorage.setItem("token", json.access_token);
-            localStorage.setItem("is_admin", json.is_admin);
+            // DO NOT store admin status in local storage for security reasons.
+            // localStorage.setItem("is_admin", json.is_admin);
             localStorage.setItem("username", formData.get("username"));
             localStorage.setItem("created_at", json.created_at || "Unknown");
 

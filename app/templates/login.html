@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/static/CSS/login.css?v=1.0.1">
+    <link rel="stylesheet" href="/static/CSS/base.css?v=<?=time()?>">
+    <link rel="stylesheet" href="/static/CSS/components.css?v=<?=time()?>">
+    <link rel="stylesheet" href="/static/CSS/login.css?v=<?=time()?>">
+
+
 </head>
 
 <body class="login-page">
@@ -19,7 +23,7 @@
         </form>
         <p id="msg"></p>
 
-        <p>Don't have an account?<a href="/signup" class="link">Create one</a></p>
+        <p>Don't have an account? <a href="/signup" class="link">Create one</a></p>
     </div>
 
     <script src="/static/js/login.js?v=1.0.1"></script>

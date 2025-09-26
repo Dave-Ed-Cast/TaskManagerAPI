@@ -1,0 +1,17 @@
+/* ===== BASE & RESET STYLES ===== */
+
+/* Reset box-sizing and margins */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Full-height flex layout for centering container */
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

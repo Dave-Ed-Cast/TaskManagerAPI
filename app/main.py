@@ -1,16 +1,25 @@
-import os
+import os, logging
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from contextlib import asynccontextmanager
 from app.database.database import init_db
 from app.routes import users, tasks
 
+logger = logging.getLogger("uvicorn")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
-app = FastAPI(title="Task Manager API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    logger.info("Database initialized")
+    yield
+    logger.info("Shutting down...")
+
+app = FastAPI(title="Task Manager API", lifespan=lifespan)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -18,8 +27,6 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 # Set up Jinja2 templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# Initialize database
-init_db()
 
 # Include API routers
 app.include_router(users.router, prefix="/users", tags=["Users"])
