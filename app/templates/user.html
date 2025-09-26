@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/CSS/base.css?v=<?=time()?>">
     <link rel="stylesheet" href="/static/CSS/components.css?v=<?=time()?>">
     <link rel="stylesheet" href="/static/CSS/user.css?v=<?=time()?>">
-    <link rel="stylesheet" href="/static/CSS/new_user.css?v=<?=time()?>">
+    <link rel="stylesheet" href="/static/CSS/modal_forms.css?v=<?=time()?>">
 
 </head>
 
@@ -29,7 +29,16 @@
             <div class="user-list-container" id="user-list"></div>
         </div>
 
-        <div id="add-user-modal" class="modal new-user-modal">
+        <div id="task-panel" class="task-panel">
+            <div class="admin-header">
+                <h3>Your Tasks</h3>
+                <button id="add-task-btn" class="add-user-btn">+</button>
+            </div>
+            <div id="task-list"></div>
+        </div>
+
+
+        <div id="add-user-modal" class="modal form-modal">
             <div class="modal-content">
                 <button class="close" id="close-add">&times;</button>
                 <h3>Add New User</h3>
@@ -45,6 +54,30 @@
                     <div class="modal-actions">
                         <button type="submit">Create</button>
                         <button type="button" id="cancel-add">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="add-task-modal" class="modal form-modal">
+            <div class="modal-content">
+                <button class="close" id="close-task-modal">&times;</button>
+                <h3>Add New Task</h3>
+                <form id="add-task-form">
+                    <label>Title:</label>
+                    <input type="text" id="new-task-title" required>
+
+                    <label>Description:</label>
+                    <input type="text" id="new-task-description">
+
+                    <div id="shared-task-container" style="display: none;">
+                        <label><input type="checkbox" id="new-task-shared">Shared Task</label>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit">Create</button>
+                        <button type="button" id="cancel-task-modal">Cancel</button>
                     </div>
                 </form>
             </div>

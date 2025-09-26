@@ -1,24 +1,26 @@
-# tasks.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from ..database import crud, models
-from ..database.dependencies import get_current_user, admin_required
+from ..database.dependencies import get_current_user
 
 router = APIRouter()
 
-@router.post("/")
+
+# ===== POST methods =====
+@router.post("/", response_model=dict)
 def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
-    user_id, _, _ = user
-    crud.create_task(task.title, task.description, user_id)
-    return {"msg": "Task created successfully"}
+    user_id = user["id"]
+    is_admin_user = user["is_admin"]
 
-@router.get("/")
-def list_tasks(user=Depends(get_current_user)):
-    user_id, _, _ = user
-    tasks = crud.get_tasks(user_id)
-    return [{"id": t[0], "title": t[1], "description": t[2], "done": t[3], "owner_id": t[4]} for t in tasks]
+    
+    # Only admins can create shared tasks
+    is_shared_task = task.is_shared and is_admin_user
 
-# Example for admin-only route
-@router.get("/all")
-def list_all_tasks(admin=Depends(admin_required)):
-    tasks = crud.get_all_tasks()
-    return [{"id": t[0], "title": t[1], "description": t[2], "done": t[3], "owner_id": t[4]} for t in tasks]
+    task_id = crud.create_task(task.title, task.description, user_id, is_shared_task)
+    return {"message": "Task created successfully", "task_id": task_id}
+
+
+# ===== GET methods =====
+#fetch tasks for user, either admin or not
+@router.get("/", response_model=list[dict])
+def list_tasks_for_user(current_user: dict = Depends(get_current_user)):
+    return crud.get_tasks_for_user(current_user)

@@ -2,8 +2,10 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from .crud import get_user
-from .auth import SECRET_KEY, ALGORITHM
-from ..constants import USER_NOT_FOUND_EX, INVALID_TOKEN_EX, ADMIN_REQUIRED_EX
+from ..constants import (
+    USER_NOT_FOUND_EX, INVALID_TOKEN_EX, 
+    ADMIN_REQUIRED_EX, SECRET_KEY, ALGORITHM
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
@@ -23,11 +25,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def admin_required(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        if not payload.get("is_admin"):
-            raise HTTPException(ADMIN_REQUIRED_EX)
-        return payload
-    except JWTError:
-        raise HTTPException(INVALID_TOKEN_EX)
+def admin_required(current_user: tuple = Depends(get_current_user)):
+    is_admin_user = current_user.get("is_admin", False)
+    if not is_admin_user:
+        raise HTTPException(ADMIN_REQUIRED_EX)
+    return current_user
