@@ -25,11 +25,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def admin_required(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        if not payload.get("is_admin"):
-            raise HTTPException(ADMIN_REQUIRED_EX)
-        return payload
-    except JWTError:
-        raise HTTPException(INVALID_TOKEN_EX)
+def admin_required(current_user: tuple = Depends(get_current_user)):
+    is_admin_user = current_user.get("is_admin", False)
+    if not is_admin_user:
+        raise HTTPException(ADMIN_REQUIRED_EX)
+    return current_user

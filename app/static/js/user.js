@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!body.classList.contains("user-page")) return;
 
     const username = localStorage.getItem("username");
-    const is_admin = localStorage.getItem("is_admin") === "true";
     const token = localStorage.getItem("token");
     const created_at = localStorage.getItem("created_at") || "Unknown";
 
@@ -27,15 +26,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Fill profile
     document.getElementById("username").innerText = username;
-    document.getElementById("role").innerText = is_admin ? "Admin" : "User";
+    // Role will be determined after attempting to load admin data
+    document.getElementById("role").innerText = "User"; 
     document.getElementById("created_at").innerText = created_at;
     document.getElementById("task-panel").style.display = "block";
 
-    if (is_admin) {
+    // Attempt to load admin-only content. If successful, reveal admin UI.
+    const isAdmin = await loadUsers(token); 
+    if (isAdmin) {
         document.getElementById("admin-panel").style.display = "block";
         document.getElementById("shared-task-container").style.display = "block";
-        loadUsers(token);
+        document.getElementById("role").innerText = "Admin";
     }
+
 
     loadTasks();
 
@@ -135,6 +138,15 @@ async function loadUsers(token) {
         const res = await fetch("/users/all", {
             headers: { "Authorization": "Bearer " + token }
         });
+
+        if (res.status === 403 || res.status === 401) {
+            console.log("Current user is not an admin.");
+            return false; // Not an admin
+        }
+        if (!res.ok) {
+            throw new Error(`Failed to fetch users with status: ${res.status}`);
+        }
+
         const users = await res.json();
 
         const container = document.getElementById("user-list");
@@ -172,9 +184,10 @@ async function loadUsers(token) {
             btn.addEventListener("click", () => deleteUser(btn.dataset.username));
         });
 
-
+        return true; // Is an admin
     } catch (err) {
         console.error("Failed to fetch users", err);
+        return false; // Failed to load, assume not admin
     }
 }
 

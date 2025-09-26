@@ -1,13 +1,15 @@
+import logging
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from ..database import auth, crud, models, database
 from ..database.dependencies import get_current_user, admin_required
 from ..constants import (
-    USERNAME_TAKEN_EX, INVALID_CREDENTIALS_EX, 
+    USERNAME_TAKEN_EX, INVALID_CREDENTIALS_EX,
     TOKEN_EXPIRATION_MINS, USER_NOT_FOUND_EX, DELETING_SELF_EX
 )
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -21,8 +23,7 @@ def register(user: models.UserCreate):
     if existing:
         raise HTTPException(USERNAME_TAKEN_EX)
 
-    user_data = crud.create_user(user.username, user.password, user.is_admin)
-    return user_data
+    return crud.create_user(user.username, user.password, user.is_admin)
 
 
 @router.post("/login")
@@ -32,19 +33,17 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not db_user:
         raise HTTPException(INVALID_CREDENTIALS_EX)
 
-    user_id, username, hashed_password, is_admin = db_user
-
-    psw_match = auth.verify_password(form_data.password, hashed_password)
+    psw_match = auth.verify_password(form_data.password, db_user["hashed_password"])
     if not psw_match:
         raise HTTPException(INVALID_CREDENTIALS_EX)
 
     access_token_expires = timedelta(minutes=TOKEN_EXPIRATION_MINS)
     token = auth.create_access_token(
-        data={"sub": username, "user_id": user_id, "is_admin": bool(is_admin)},
+        data={"sub": db_user["username"], "user_id": db_user["id"], "is_admin": db_user["is_admin"]},
         expires_delta=access_token_expires
     )
 
-    return {"access_token": token, "token_type": "bearer", "is_admin": bool(is_admin)}
+    return {"access_token": token, "token_type": "bearer", "is_admin": db_user["is_admin"]}
 
 
 # ===== GET methods =====
@@ -61,32 +60,21 @@ def list_users(_=Depends(admin_required)):
     return [{"id": user[0], "username": user[1], "is_admin": user[2]} for user in users]
 
 
-@router.get("/")
-def list_tasks(user=Depends(get_current_user)):
-    user_id, _, _ = user
-    tasks = crud.get_all_admin_tasks(user_id)
-
-    return [{"id": t[0], "title": t[1], "description": t[2], "done": t[3], "owner_id": t[4]} for t in tasks]
-
-
 # ===== PUT methods =====
 @router.put("/{username}/password")
 def admin_reset_password(username: str, data: models.PasswordUpdate, admin=Depends(admin_required)):
-    # logging purposes
-    admin_username = admin.get("sub", "unknown")
-    print(f"Admin '{admin_username}' is resetting password for user '{username}' at {datetime.now()}")
+    admin_username = admin["username"]
+    logger.info(f"Admin {admin_username} is resetting password for user '{username}'")
 
     success = crud.update_user_password(username, data.new_password)
     if not success:
         raise HTTPException(USER_NOT_FOUND_EX)
-    return {"msg": f"Password for '{username}' has been updated successfully"}
+    return {"message": f"Password for '{username}' has been updated successfully"}
 
 
 @router.put("/{username}/role")
-def change_user_role(username: str, is_admin: bool, _=Depends(admin_required)):
-    # Prevent admin from changing their own role to avoid self-lockout
-    current_admin_user = _
-    if current_admin_user['sub'] == username:
+def change_user_role(username: str, is_admin: bool, current_admin=Depends(admin_required)):
+    if current_admin["username"] == username:
         raise HTTPException(DELETING_SELF_EX)
 
     if not crud.update_user_role(username, is_admin):
@@ -99,13 +87,12 @@ def change_user_role(username: str, is_admin: bool, _=Depends(admin_required)):
 # ===== DELETE methods =====
 @router.delete("/{username}")
 def remove_user(username: str, admin=Depends(admin_required)):
-    # logging purposes
-    admin_username = admin.get("sub", "unknown")
+    admin_username = admin["username"]
     if username == admin_username:
         raise HTTPException(DELETING_SELF_EX)
     
-    print(f"[ADMIN ACTION] Admin '{admin_username}' is deleting user '{username}' at {datetime.now()}")
 
+    logger.warning(f"Admin {admin_username} is deleting user '{username}'")
     success = crud.delete_user(username)
     if not success:
         raise HTTPException(USER_NOT_FOUND_EX)
