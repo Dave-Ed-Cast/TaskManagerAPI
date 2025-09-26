@@ -32,6 +32,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     if not db_user:
         raise HTTPException(INVALID_CREDENTIALS_EX)
+    if not db_user:
+        raise HTTPException(INVALID_CREDENTIALS_EX)
 
     psw_match = auth.verify_password(form_data.password, db_user["hashed_password"])
     if not psw_match:
@@ -56,6 +58,7 @@ def list_users(_=Depends(admin_required)):
         read_query = "SELECT id, username, is_admin FROM users"
         cursor.execute(read_query)
         users = cursor.fetchall()
+
 
     return [{"id": user[0], "username": user[1], "is_admin": user[2]} for user in users]
 

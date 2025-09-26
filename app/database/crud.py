@@ -1,4 +1,5 @@
 from .database import get_db
+from ..constants import USERNAME_TAKEN_EX
 from .auth import hash_password, create_access_token
 from ..constants import USERNAME_TAKEN_EX
 from .utility import _row_to_user_dict, _row_to_task_dict
@@ -57,6 +58,7 @@ def create_task(title: str, description: str, owner_id: int, is_shared: bool = F
         """
         cursor.execute(create_query, (title, description, owner_id, int(is_shared)))
         connection.commit()
+        return cursor.lastrowid
 
 
 # ==== R in the crud acronym ====
@@ -98,6 +100,13 @@ def get_tasks_for_user(user: dict):
             rows = cursor.fetchall()
 
         return [_row_to_task_dict(r) for r in rows]
+
+
+def get_all_tasks():
+    with get_db() as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks")
+        return cursor.fetchall()
 
 
 # ==== U in the crud acronym ====
