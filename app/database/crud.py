@@ -10,13 +10,11 @@ import sqlite3
 def create_user(username: str, password: str, is_admin: bool = False):
     from .crud import get_user  # avoid circular import
 
-    # Check the user doesn't already exist
     if get_user(username):
         raise HTTPException(USERNAME_TAKEN_EX)
 
     hashed_pw = hash_password(password)
 
-    # insert into DB
     try:
         with get_db() as connection:
             cursor = connection.cursor()
@@ -27,7 +25,6 @@ def create_user(username: str, password: str, is_admin: bool = False):
     except sqlite3.IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # generate jwt token to pass to frontend
     access_token = create_access_token({
         "sub": username,
         "user_id": user_id,
@@ -60,13 +57,30 @@ def get_user(username: str):
         return cursor.fetchone()
 
 
-def get_tasks(owner_id: int):
+# Fetch the user, either admin or user and filter the output
+def get_tasks_for_user(user_tuple: tuple):
+    user = {
+        "id": user_tuple[0],
+        "username": user_tuple[1],
+        "is_admin": bool(user_tuple[3])
+    }
+
     with get_db() as connection:
         cursor = connection.cursor()
-        get_query = "SELECT * FROM tasks WHERE owner_id=?"
-        cursor.execute(get_query, (owner_id,))
+        if user['is_admin']:
+            query = """
+                SELECT t.*
+                FROM tasks t
+                JOIN users u ON t.owner_id = u.id
+                WHERE u.is_admin = 1
+            """
+            cursor.execute(query)
+        else:
+            query = "SELECT * FROM tasks WHERE owner_id=?"
+            cursor.execute(query, (user['id'],))
+        
         return cursor.fetchall()
-
+    
 
 # ==== U in the crud acronym ====
 def update_user_role(username: str, is_admin: bool) -> bool:

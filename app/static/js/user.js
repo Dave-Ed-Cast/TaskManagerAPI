@@ -23,11 +23,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("username").innerText = username;
     document.getElementById("role").innerText = is_admin ? "Admin" : "User";
     document.getElementById("created_at").innerText = created_at;
+    document.getElementById("task-panel").style.display = "block";
 
     if (is_admin) {
         document.getElementById("admin-panel").style.display = "block";
         loadUsers(token);
     }
+
+    loadTasks();
 
     // --- Modal open/close ---
     addUserBtn?.addEventListener("click", () => addUserModal.classList.add("show"));
@@ -95,14 +98,13 @@ async function loadUsers(token) {
             const div = document.createElement("div");
             div.classList.add("user-item");
             div.innerHTML = `
-                <div class="username">${u.username}</div>
-                <div class="role">${u.is_admin ? "Admin" : "User"}</div>
+                <span class="username">${u.username}</span>
+                <span class="role">${u.is_admin ? 'Admin' : 'User'}</span>
                 <button class="role-btn" data-username="${u.username}" data-role="${!u.is_admin}">
-                    ${u.is_admin ? "Make User" : "Make Admin"}
+                    Make ${!u.is_admin ? 'Admin' : 'User'}
                 </button>
-                <button class="key-btn" data-username="${u.username}" title="Delete">🔑</button>
-                <button class="delete-btn" data-username="${u.username}" title="Delete">🗑️</button>
-
+                <button class="key-btn" data-username="${u.username}">🔑</button>
+                <button class="delete-btn" data-username="${u.username}">🗑️</button>
             `;
             container.appendChild(div);
         });
@@ -130,6 +132,56 @@ async function loadUsers(token) {
     }
 }
 
+async function loadTasks() {
+    const token = localStorage.getItem("token");
+    const isAdmin = localStorage.getItem("is_admin") === "true";
+
+    const endpoint = "/tasks"; 
+    try {
+        const res = await fetch(endpoint, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.detail || "Failed to load tasks");
+            return;
+        }
+
+        const tasks = await res.json();
+        const container = document.getElementById("task-list");
+        container.innerHTML = "";
+
+        if (tasks.length === 0) {
+            container.innerHTML = `<p>No tasks found.</p>`;
+            return;
+        }
+
+        tasks.forEach(t => {
+            const div = document.createElement("div");
+            div.classList.add("task-item");
+            div.innerHTML = `
+                <div class="task-header">
+                    <div class="task-title"><strong>${t.title}</strong></div>
+                    <div class="task-meta">
+                        <span>Status: ${t.done ? "✅ Done" : "⏳ Pending"}</span>
+                        ${isAdmin ? `<span class="task-owner">Owner: ${t.owner_id}</span>` : ""}
+                    </div>
+                </div>
+                <div class="task-desc">${t.description || ""}</div>
+            `;
+            container.appendChild(div);
+        });
+
+        console.log("Task container:", document.getElementById("task-list"));
+        console.log("Tasks loaded:", tasks);
+
+    } catch (err) {
+        console.error("Failed to fetch tasks", err);
+    }
+}
+
+
 async function changeRole(username, is_admin) {
     const token = localStorage.getItem("token");
     try {
@@ -137,11 +189,18 @@ async function changeRole(username, is_admin) {
             method: "PUT",
             headers: { "Authorization": "Bearer " + token }
         });
+
+        // Add this check to handle errors properly
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || "Failed to update role");
+        }
+
         const json = await res.json();
         alert(json.message);
         loadUsers(token);
-    } catch {
-        alert("Failed to update role");
+    } catch (err) {
+        alert(err.message);
     }
 }
 
@@ -193,8 +252,3 @@ async function resetPassword(username, newPassword) {
         alert(err.message);
     }
 }
-
-document.querySelector(".logout-btn")?.addEventListener("click", () => {
-    localStorage.clear();
-    window.location.href = "/";
-});

@@ -7,20 +7,20 @@ from ..database.dependencies import get_current_user, admin_required
 router = APIRouter()
 
 
-@router.post("/")
+# ===== POST methods =====
+@router.post("/", response_model=dict)
 def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
     user_id, _, _ = user
     crud.create_task(task.title, task.description, user_id)
     return {"msg": "Task created successfully"}
 
-@router.get("/")
-def list_tasks(user=Depends(get_current_user)):
-    user_id, _, _ = user
-    tasks = crud.get_tasks(user_id)
-    return [{"id": t[0], "title": t[1], "description": t[2], "done": t[3], "owner_id": t[4]} for t in tasks]
 
-# Example for admin-only route
-@router.get("/all")
-def list_all_tasks(admin=Depends(admin_required)):
-    tasks = crud.get_all_tasks()
-    return [{"id": t[0], "title": t[1], "description": t[2], "done": t[3], "owner_id": t[4]} for t in tasks]
+# ===== GET methods =====
+#fetch tasks for user, either admin or not
+@router.get("/", response_model=list[dict])
+def list_tasks_for_user(current_user: dict = Depends(get_current_user)):
+    rows = crud.get_tasks_for_user(current_user)
+    return [
+        {"id": t[0], "title": t[1], "description": t[2], "done": bool(t[3]), "owner_id": t[4]}
+        for t in rows
+    ]
