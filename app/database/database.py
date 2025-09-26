@@ -23,6 +23,7 @@ def init_db():
         description TEXT,
         done BOOLEAN DEFAULT 0,
         owner_id INTEGER,
+        is_shared BOOLEAN DEFAULT 0,
         FOREIGN KEY(owner_id) REFERENCES users(id)
     )
     """)

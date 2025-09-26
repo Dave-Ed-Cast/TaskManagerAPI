@@ -10,8 +10,12 @@ router = APIRouter()
 # ===== POST methods =====
 @router.post("/", response_model=dict)
 def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
-    user_id, _, _ = user
-    crud.create_task(task.title, task.description, user_id)
+    user_id, _, _, is_admin_user = user
+    
+    # Only admins can create shared tasks
+    is_shared_task = task.is_shared and is_admin_user
+
+    crud.create_task(task.title, task.description, user_id, is_shared_task)
     return {"msg": "Task created successfully"}
 
 
@@ -21,6 +25,6 @@ def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
 def list_tasks_for_user(current_user: dict = Depends(get_current_user)):
     rows = crud.get_tasks_for_user(current_user)
     return [
-        {"id": t[0], "title": t[1], "description": t[2], "done": bool(t[3]), "owner_id": t[4]}
+        {"id": t[0], "title": t[1], "description": t[2], "done": bool(t[3]), "owner_id": t[4], "is_shared": bool(t[5])}
         for t in rows
     ]

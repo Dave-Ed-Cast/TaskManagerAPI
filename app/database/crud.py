@@ -40,11 +40,11 @@ def create_user(username: str, password: str, is_admin: bool = False):
     }
 
 
-def create_task(title: str, description: str, owner_id: int):
+def create_task(title: str, description: str, owner_id: int, is_shared: bool = False):
     with get_db() as connection:
         cursor = connection.cursor()
-        create_query = "INSERT INTO tasks (title, description, owner_id) VALUES (?, ?, ?)"
-        cursor.execute(create_query, (title, description, owner_id))
+        create_query = "INSERT INTO tasks (title, description, owner_id, is_shared) VALUES (?, ?, ?, ?)"
+        cursor.execute(create_query, (title, description, owner_id, int(is_shared)))
         connection.commit()
 
 
@@ -68,14 +68,11 @@ def get_tasks_for_user(user_tuple: tuple):
     with get_db() as connection:
         cursor = connection.cursor()
         if user['is_admin']:
-            query = """
-                SELECT t.*
-                FROM tasks t
-                JOIN users u ON t.owner_id = u.id
-                WHERE u.is_admin = 1
-            """
-            cursor.execute(query)
+            # Admins see their own tasks plus any shared tasks
+            query = "SELECT * FROM tasks WHERE owner_id=? OR is_shared=1"
+            cursor.execute(query, (user['id'],))
         else:
+            # Regular users see only their own tasks
             query = "SELECT * FROM tasks WHERE owner_id=?"
             cursor.execute(query, (user['id'],))
         

@@ -14,6 +14,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const closeAddBtn = document.getElementById("close-add");
     const logoutBtn = document.querySelector(".logout-btn");
 
+    const addTaskBtn = document.getElementById("add-task-btn");
+    const addTaskModal = document.getElementById("add-task-modal");
+    const cancelTaskBtn = document.getElementById("cancel-task-modal");
+    const closeTaskModalBtn = document.getElementById("close-task-modal");
+    const addTaskForm = document.getElementById("add-task-form");
+
     if (!username || !token) {
         window.location.href = "/";
         return;
@@ -27,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (is_admin) {
         document.getElementById("admin-panel").style.display = "block";
+        document.getElementById("shared-task-container").style.display = "block";
         loadUsers(token);
     }
 
@@ -37,12 +44,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     cancelAddBtn?.addEventListener("click", () => addUserModal.classList.remove("show"));
     closeAddBtn?.addEventListener("click", () => addUserModal.classList.remove("show"));
 
+    addTaskBtn?.addEventListener("click", () => addTaskModal.classList.add("show"));
+    cancelTaskBtn?.addEventListener("click", () => addTaskModal.classList.remove("show"));
+    closeTaskModalBtn?.addEventListener("click", () => addTaskModal.classList.remove("show"));
+
     window.addEventListener("click", (e) => {
         if (e.target === addUserModal) addUserModal.classList.remove("show");
+        if (e.target === addTaskModal) addTaskModal.classList.remove("show");
     });
 
     window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") addUserModal.classList.remove("show");
+        if (e.key === "Escape") {
+            addUserModal.classList.remove("show");
+            addTaskModal.classList.remove("show");
+        }
     });
 
     // --- Add User Form Submission ---
@@ -72,6 +87,37 @@ document.addEventListener("DOMContentLoaded", async function () {
             addUserModal.classList.remove("show");
             addUserForm.reset();
             loadUsers(token); // refresh list
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // --- Add Task Form Submission ---
+    addTaskForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = document.getElementById("new-task-title").value.trim();
+        const description = document.getElementById("new-task-description").value.trim();
+        const isShared = document.getElementById("new-task-shared").checked;
+
+        if (!title) return alert("Task title is required.");
+
+        try {
+            const res = await fetch("/tasks/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({ title, description, is_shared: isShared })
+            });
+
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.detail || "Failed to create task");
+
+            alert(json.msg || "Task created successfully");
+            addTaskModal.classList.remove("show");
+            addTaskForm.reset();
+            loadTasks(); // Refresh task list
         } catch (err) {
             alert(err.message);
         }
@@ -165,7 +211,8 @@ async function loadTasks() {
                     <div class="task-title"><strong>${t.title}</strong></div>
                     <div class="task-meta">
                         <span>Status: ${t.done ? "✅ Done" : "⏳ Pending"}</span>
-                        ${isAdmin ? `<span class="task-owner">Owner: ${t.owner_id}</span>` : ""}
+                        ${isAdmin && t.is_shared ? `<span class="task-owner">Shared</span>` : ""}
+                        ${isAdmin && !t.is_shared ? `<span class="task-owner">Owner: ${t.owner_id}</span>` : ""}
                     </div>
                 </div>
                 <div class="task-desc">${t.description || ""}</div>

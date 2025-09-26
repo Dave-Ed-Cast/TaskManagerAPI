@@ -30,7 +30,10 @@
         </div>
 
         <div id="task-panel" class="task-panel">
-            <h3>Your Tasks</h3>
+            <div class="admin-header">
+                <h3>Your Tasks</h3>
+                <button id="add-task-btn" class="add-user-btn">+</button>
+            </div>
             <div id="task-list"></div>
         </div>
 
@@ -51,6 +54,30 @@
                     <div class="modal-actions">
                         <button type="submit">Create</button>
                         <button type="button" id="cancel-add">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="add-task-modal" class="modal new-user-modal">
+            <div class="modal-content">
+                <button class="close" id="close-task-modal">&times;</button>
+                <h3>Add New Task</h3>
+                <form id="add-task-form">
+                    <label>Title:</label>
+                    <input type="text" id="new-task-title" required>
+
+                    <label>Description:</label>
+                    <input type="text" id="new-task-description">
+
+                    <div id="shared-task-container" style="display: none;">
+                        <label><input type="checkbox" id="new-task-shared">Shared Task</label>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit">Create Task</button>
+                        <button type="button" id="cancel-task-modal">Cancel</button>
                     </div>
                 </form>
             </div>
