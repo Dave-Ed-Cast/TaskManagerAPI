@@ -21,20 +21,36 @@
             <p><strong>Date of creation:</strong> <span id="created_at"></span></p>
         </div>
 
-        <div id="admin-panel" class="admin-panel" style="display:none;">
-            <div class="admin-header">
-                <h3>All Users</h3>
-                <button id="add-user-btn" class="add-user-btn">+</button>
+        <div class="main-content">
+            <div id="admin-panel" class="admin-panel" style="display:none;">
+                <div class="admin-header">
+                    <h3>All Users</h3>
+                    <button id="add-user-btn" class="add-user-btn">+</button>
+                </div>
+                <div class="user-list-container" id="user-list"></div>
             </div>
-            <div class="user-list-container" id="user-list"></div>
-        </div>
 
-        <div id="task-panel" class="task-panel">
-            <div class="admin-header">
-                <h3>Your Tasks</h3>
-                <button id="add-task-btn" class="add-user-btn">+</button>
+            <div id="task-panel" class="task-panel">
+                <div class="task-header-row">
+                    <div class="task-header-column">
+                        <div class="admin-header task-controls">
+                            <h3>Shared Tasks</h3>
+                            <div class="placeholder-btn"></div>
+                        </div>
+                    </div>
+
+                    <div class="task-header-column">
+                        <div class="admin-header task-controls">
+                            <h3>Personal Tasks</h3>
+                            <button id="add-task-btn" class="add-user-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="task-columns">
+                    <div id="shared-task-list" class="task-column"></div>
+                    <div id="personal-task-list" class="task-column"></div>
+                </div>
             </div>
-            <div id="task-list"></div>
         </div>
 
 
@@ -87,7 +103,7 @@
         <button class="logout-btn">
             <h4>Logout</h4>
         </button>
-        <script src="/static/js/user.js?v=1.0.1"></script>
+        <script src="/static/js/user.js?v=<?=time()?>"></script>
     </div>
 </body>
 

@@ -27,12 +27,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Fill profile
     document.getElementById("username").innerText = username;
     // Role will be determined after attempting to load admin data
-    document.getElementById("role").innerText = "User"; 
+    document.getElementById("role").innerText = "User";
     document.getElementById("created_at").innerText = created_at;
     document.getElementById("task-panel").style.display = "block";
 
     // Attempt to load admin-only content. If successful, reveal admin UI.
-    const isAdmin = await loadUsers(token); 
+    const isAdmin = await loadUsers(token);
     if (isAdmin) {
         document.getElementById("admin-panel").style.display = "block";
         document.getElementById("shared-task-container").style.display = "block";
@@ -89,13 +89,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             alert(json.msg || "User created successfully");
             addUserModal.classList.remove("show");
             addUserForm.reset();
-            loadUsers(token); // refresh list
+            loadUsers(token);
         } catch (err) {
             alert(err.message);
         }
     });
 
-    // --- Add Task Form Submission ---
     addTaskForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
         const title = document.getElementById("new-task-title").value.trim();
@@ -120,13 +119,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             alert(json.msg || "Task created successfully");
             addTaskModal.classList.remove("show");
             addTaskForm.reset();
-            loadTasks(); // Refresh task list
+            loadTasks();
         } catch (err) {
             alert(err.message);
         }
     });
 
-    // --- Logout handler ---
     logoutBtn?.addEventListener("click", () => {
         localStorage.clear();
         window.location.href = "/";
@@ -195,9 +193,8 @@ async function loadTasks() {
     const token = localStorage.getItem("token");
     const isAdmin = localStorage.getItem("is_admin") === "true";
 
-    const endpoint = "/tasks"; 
     try {
-        const res = await fetch(endpoint, {
+        const res = await fetch("/tasks", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
@@ -208,11 +205,18 @@ async function loadTasks() {
         }
 
         const tasks = await res.json();
-        const container = document.getElementById("task-list");
-        container.innerHTML = "";
+
+        // Grab the two new containers
+        const sharedContainer = document.getElementById("shared-task-list");
+        const personalContainer = document.getElementById("personal-task-list");
+
+        // Clear previous tasks
+        sharedContainer.innerHTML = "";
+        personalContainer.innerHTML = "";
 
         if (tasks.length === 0) {
-            container.innerHTML = `<p>No tasks found.</p>`;
+            sharedContainer.innerHTML = `<p>No shared tasks found.</p>`;
+            personalContainer.innerHTML = `<p>No personal tasks found.</p>`;
             return;
         }
 
@@ -221,7 +225,7 @@ async function loadTasks() {
             div.classList.add("task-item");
             div.innerHTML = `
                 <div class="task-header">
-                    <div class="task-title"><strong>${t.title}</strong></div>
+                    <div class="task-title">${t.title}</div>
                     <div class="task-meta">
                         <span>Status: ${t.done ? "✅ Done" : "⏳ Pending"}</span>
                         ${isAdmin && t.is_shared ? `<span class="task-owner">Shared</span>` : ""}
@@ -230,16 +234,23 @@ async function loadTasks() {
                 </div>
                 <div class="task-desc">${t.description || ""}</div>
             `;
-            container.appendChild(div);
+
+            if (t.is_shared) {
+                sharedContainer.appendChild(div);
+            } else {
+                personalContainer.appendChild(div);
+            }
         });
 
-        console.log("Task container:", document.getElementById("task-list"));
+        console.log("Shared tasks container:", sharedContainer);
+        console.log("Personal tasks container:", personalContainer);
         console.log("Tasks loaded:", tasks);
 
     } catch (err) {
         console.error("Failed to fetch tasks", err);
     }
 }
+
 
 
 async function changeRole(username, is_admin) {
