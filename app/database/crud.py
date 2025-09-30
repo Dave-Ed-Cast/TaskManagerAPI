@@ -147,3 +147,14 @@ def delete_user(username: str) -> bool:
         cursor.execute(delete_query, (username,))
         connection.commit()
         return cursor.rowcount > 0  # true if deleted
+    
+def delete_task(task_id: int, user_id: int, is_admin: bool) -> bool:
+    with get_db() as connection:
+        cursor = connection.cursor()
+        delete_query = """
+            DELETE FROM tasks 
+            WHERE id = ? AND (owner_id = ? OR ? = 1)
+        """
+        cursor.execute(delete_query, (task_id, user_id, int(is_admin)))
+        connection.commit()
+        return cursor.rowcount > 0

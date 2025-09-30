@@ -32,14 +32,10 @@ body.user-page {
     font-size: 1rem;
 }
 
-.profile-info p {
-    margin: 0.1rem 0;
-}
 
 /* Panels */
 .admin-panel {
-    width: 700px;
-    flex-shrink: 0;
+    width: 30%
 }
 
 .task-panel {
@@ -101,19 +97,16 @@ body.user-page {
 
 .key-btn,
 .delete-btn {
-    width: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    background: transparent; 
+    border: none;            
+    padding: 0;             
 }
 
-.delete-btn:hover {
-    transform: scale(1.2);
-    color: #c53030;
-}
-
-.key-btn:hover {
+.key-btn:hover, .delete-btn:hover {
     transform: scale(1.2);
 }
 
@@ -234,4 +227,18 @@ body.user-page {
     flex: 1;
     margin: 0;
     text-align: left;
+}
+
+
+.task-item .delete-task-btn {
+    align-self: flex-end;
+    background: none;      
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.task-item .delete-task-btn:hover {
+    transform: scale(1.2);
 }
