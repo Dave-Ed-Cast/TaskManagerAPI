@@ -38,6 +38,11 @@ DELETING_SELF_EX = HTTPException(
     detail="Forbidden, admin cannot delete self"
 )
 
+DELETING_TASK_EX = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Forbidden, not allowed to delete this task"
+)
+
 # 404
 USER_NOT_FOUND_EX = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,

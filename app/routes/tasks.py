@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from ..database import crud, models
 from ..database.dependencies import get_current_user
-
+from ..constants import DELETING_TASK_EX
 router = APIRouter()
 
 
@@ -24,3 +24,12 @@ def create_task(task: models.TaskCreate, user=Depends(get_current_user)):
 @router.get("/", response_model=list[dict])
 def list_tasks_for_user(current_user: dict = Depends(get_current_user)):
     return crud.get_tasks_for_user(current_user)
+
+
+# ===== DELETE methods =====
+@router.delete("/{task_id}", response_model=dict)
+def delete_task(task_id: int, user=Depends(get_current_user)):
+    success = crud.delete_task(task_id, user["id"], user["is_admin"])
+    if not success:
+        raise HTTPException(DELETING_TASK_EX)
+    return {"message": "Task deleted successfully"}

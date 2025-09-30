@@ -233,14 +233,40 @@ async function loadTasks() {
                     </div>
                 </div>
                 <div class="task-desc">${t.description || ""}</div>
-            `;
-
+                <button class="delete-task-btn" data-task-id="${t.id}">🗑️</button>
+                `;
             if (t.is_shared) {
                 sharedContainer.appendChild(div);
             } else {
                 personalContainer.appendChild(div);
             }
         });
+
+        // Attach delete events after rendering
+        document.querySelectorAll(".delete-task-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const taskId = btn.dataset.taskId;
+                if (!confirm("Are you sure you want to delete this task?")) return;
+
+                const token = localStorage.getItem("token");
+                try {
+                    const res = await fetch(`/tasks/${taskId}`, {
+                        method: "DELETE",
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.detail || "Failed to delete task");
+
+                    alert(json.message);
+                    loadTasks(); // reload after deletion
+                } catch (err) {
+                    alert(err.message);
+                }
+            });
+        });
+
+
 
         console.log("Shared tasks container:", sharedContainer);
         console.log("Personal tasks container:", personalContainer);
