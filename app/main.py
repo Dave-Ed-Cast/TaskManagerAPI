@@ -14,7 +14,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    await init_db()
     logger.info("Database initialized")
     yield
     logger.info("Shutting down...")
